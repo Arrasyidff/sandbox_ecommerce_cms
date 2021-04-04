@@ -1,5 +1,7 @@
 # sandbox_ecommerce_cms
 
+to running you must clone this repo https://github.com/Arrasyidff/sandbox_ecommerce_server
+
 ## Project setup
 ```
 npm install
