@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button class="btn btn-primary mb-3" type="button" @click="showAddProduct">Add Product</button>
     <md-dialog :md-active.sync="showDeleteDialog">
       <div class="delete-dialog">
         <div class="icon-delete">
@@ -18,32 +19,32 @@
         </div>
       </div>
     </md-dialog>
-    <md-dialog :md-active.sync="showUpdateDialog">
-      <div class="update-dialog">
-        <h1>Update</h1>
-        <form @submit.prevent="updateProduct">
+    <md-dialog :md-active.sync="showFormDialog">
+      <div class="form-dialog">
+        <h1>{{title}}</h1>
+        <form @submit.prevent="submitProduct">
           <div class="mb-3 row">
-            <label for="inputUpdateNameProduct" class="col-sm-2 col-form-label">Name</label>
+            <label for="inputFormNameProduct" class="col-sm-2 col-form-label">Name</label>
             <div class="col-sm-10">
-              <input v-model="nameProduct" type="text" class="form-control" id="inputUpdateNameProduct">
+              <input v-model="nameProduct" type="text" class="form-control" id="inputFormNameProduct">
             </div>
           </div>
           <div class="mb-3 row">
-            <label for="inputUpdatePrice" class="col-sm-2 col-form-label">Price</label>
+            <label for="inputFormPrice" class="col-sm-2 col-form-label">Price</label>
             <div class="col-sm-10">
-              <input v-model="priceProduct" type="number" class="form-control" id="inputUpdatePrice">
+              <input v-model="priceProduct" type="number" class="form-control" id="inputFormPrice">
             </div>
           </div>
           <div class="mb-3 row">
-            <label for="inputUpdateStock" class="col-sm-2 col-form-label">Stock</label>
+            <label for="inputFormStock" class="col-sm-2 col-form-label">Stock</label>
             <div class="col-sm-10">
-              <input v-model="stockProduct" type="number" class="form-control" id="inputUpdateStock">
+              <input v-model="stockProduct" type="number" class="form-control" id="inputFormStock">
             </div>
           </div>
           <div class="mb-3 row">
-            <label for="inputUpdateImageUrl" class="col-sm-2 col-form-label">Image URL</label>
+            <label for="inputFormImageUrl" class="col-sm-2 col-form-label">Image URL</label>
             <div class="col-sm-10">
-              <input v-model="imageUrlProduct" type="text" class="form-control" id="inputUpdateImageUrl">
+              <input v-model="imageUrlProduct" type="text" class="form-control" id="inputFormImageUrl">
             </div>
           </div>
           <div v-if="error !== null" class="mb-3">
@@ -100,8 +101,9 @@ export default {
   data () {
     return {
       error: null,
+      title: '',
       showDeleteDialog: false,
-      showUpdateDialog: false,
+      showFormDialog: false,
       idDelete: '',
       idUpdate: '',
       nameProduct: '',
@@ -117,41 +119,69 @@ export default {
   },
   methods: {
     resetData () {
+      this.title = ''
       this.idDelete = ''
       this.idUpdate = ''
       this.showDeleteDialog = false
-      this.showUpdateDialog = false
+      this.showFormDialog = false
       this.nameProduct = ''
       this.priceProduct = 0
       this.stockProduct = 0
       this.imageUrlProduct = ''
       this.error = null
     },
-    updateProduct () {
-      Axios({
-        url: 'products/' + this.idUpdate,
-        method: 'PUT',
-        data: {
-          name: this.nameProduct,
-          price: this.priceProduct,
-          stock: this.stockProduct,
-          image_url: this.imageUrlProduct
-        },
-        headers: {
-          access_token: localStorage.getItem('access_token')
-        }
-      })
-        .then(({ data }) => {
-          this.resetData()
-          this.fetchAllProducts()
+    submitProduct () {
+      if (this.title === 'Add New Product') {
+        Axios({
+          url: 'products',
+          method: 'POST',
+          data: {
+            name: this.nameProduct,
+            price: this.priceProduct,
+            stock: this.stockProduct,
+            image_url: this.imageUrlProduct
+          },
+          headers: {
+            access_token: localStorage.getItem('access_token')
+          }
         })
-        .catch(err => {
-          console.log(err.response.data.msg)
-          this.error = err.response.data.msg
-          setTimeout(() => {
-            this.error = null
-          }, 3000)
+          .then(({ data }) => {
+            this.fetchAllProducts()
+            this.resetData()
+          })
+          .catch(err => {
+            console.log(err.response.data.msg)
+            this.error = err.response.data.msg
+            setTimeout(() => {
+              this.error = null
+            }, 3000)
+          })
+      } else if (this.title === 'Update Product') {
+        Axios({
+          url: 'products/' + this.idUpdate,
+          method: 'PUT',
+          data: {
+            name: this.nameProduct,
+            price: this.priceProduct,
+            stock: this.stockProduct,
+            image_url: this.imageUrlProduct
+          },
+          headers: {
+            access_token: localStorage.getItem('access_token')
+          }
         })
+          .then(({ data }) => {
+            this.resetData()
+            this.fetchAllProducts()
+          })
+          .catch(err => {
+            console.log(err.response.data.msg)
+            this.error = err.response.data.msg
+            setTimeout(() => {
+              this.error = null
+            }, 3000)
+          })
+      }
     },
     deleteProduct () {
       Axios({
@@ -176,12 +206,18 @@ export default {
     },
     showUpdateDialogMethod (payload) {
       this.resetData()
-      this.showUpdateDialog = true
+      this.title = 'Update Product'
+      this.showFormDialog = true
       this.idUpdate = payload.id
       this.nameProduct = payload.name
       this.priceProduct = payload.price
       this.stockProduct = payload.stock
       this.imageUrlProduct = payload.image_url
+    },
+    showAddProduct () {
+      this.resetData()
+      this.title = 'Add New Product'
+      this.showFormDialog = true
     },
     fetchAllProducts () {
       this.$store.dispatch('fetchProducts')
@@ -275,13 +311,13 @@ export default {
   background: rgb(194, 35, 35);
 }
 
-/* UPDATE DIALOG */
-.update-dialog {
+/* FORM DIALOG */
+.form-dialog {
   width: 650px;
   padding: 10px 20px;
 }
 
-.update-dialog h1 {
+.form-dialog h1 {
   text-align: center;
   margin-bottom: 20px;
 }

@@ -2,8 +2,9 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
-import About from '../views/About.vue'
+import Transactions from '../views/Transactions.vue'
 import Products from '../views/Products.vue'
+import DetailTransaction from '../views/DetailTransaction.vue'
 
 Vue.use(VueRouter)
 
@@ -11,6 +12,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
+    redirect: '/products',
     component: Home,
     children: [
       {
@@ -19,9 +21,21 @@ const routes = [
         component: Products
       },
       {
-        path: 'about',
-        name: 'About',
-        component: About
+        path: 'transactions',
+        name: 'Transactions',
+        component: Transactions
+        // children: [
+        //   {
+        //     path: ':id',
+        //     name: 'Detail Transaction',
+        //     component: DetailTransaction
+        //   }
+        // ]
+      },
+      {
+        path: 'transaction-:id',
+        name: 'Detail Transaction',
+        component: DetailTransaction
       }
     ]
   },

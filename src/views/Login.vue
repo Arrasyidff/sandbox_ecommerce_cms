@@ -43,24 +43,36 @@ export default {
   },
   methods: {
     loginOn () {
-      Axios({
-        url: 'login-admin',
-        method: 'POST',
-        data: {
-          email: this.email,
-          password: this.password
-        }
-      })
-        .then(({ data }) => {
-          localStorage.setItem('access_token', data.access_token)
-          this.$router.push('/')
+      if (this.email === '') {
+        this.error = 'email cant be empty'
+        setTimeout(() => {
+          this.error = null
+        }, 3000)
+      } else if (this.password === '') {
+        this.error = 'password cant be empty'
+        setTimeout(() => {
+          this.error = null
+        }, 3000)
+      } else {
+        Axios({
+          url: 'login-admin',
+          method: 'POST',
+          data: {
+            email: this.email,
+            password: this.password
+          }
         })
-        .catch(err => {
-          this.error = err.response.data.msg
-          setTimeout(() => {
-            this.error = null
-          }, 3000)
-        })
+          .then(({ data }) => {
+            localStorage.setItem('access_token', data.access_token)
+            this.$router.push('/')
+          })
+          .catch(err => {
+            this.error = err.response.data.msg
+            setTimeout(() => {
+              this.error = null
+            }, 3000)
+          })
+      }
     }
   }
 }

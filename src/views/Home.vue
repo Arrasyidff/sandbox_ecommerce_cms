@@ -4,8 +4,8 @@
       <h1>ARFAFA</h1>
       <div>
         <router-link :to="{name: 'Products'}">Products</router-link>
-        <router-link :to="{name: 'About'}">Transactions</router-link>
-        <button class="nav-logout">Logout</button>
+        <router-link :to="{name: 'Transactions'}">Transactions</router-link>
+        <button @click="logout" class="nav-logout">Logout</button>
       </div>
     </div>
     <div class="content">
@@ -17,7 +17,13 @@
 <script>
 
 export default {
-  name: 'Home-Page'
+  name: 'Home-Page',
+  methods: {
+    logout () {
+      localStorage.clear()
+      this.$router.push('/login')
+    }
+  }
 }
 </script>
 
